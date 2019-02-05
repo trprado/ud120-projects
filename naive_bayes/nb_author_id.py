@@ -42,7 +42,6 @@ print('Acurracia: ', round(accuracy, 4))
 
 # Results
 #########################################################
-# n nb_author_id.py
 # no. of Chris training emails: 7936
 # no. of Sara training emails: 7884
 # tempo de treinamento: 2.592 s

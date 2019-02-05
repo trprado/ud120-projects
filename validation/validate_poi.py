@@ -1,6 +1,3 @@
-#!/usr/bin/python
-
-
 """
     Starter code for the validation mini-project.
     The first step toward building your POI identifier!
@@ -27,6 +24,4 @@ labels, features = targetFeatureSplit(data)
 
 
 
-### it's all yours from here forward!  
-
-
+### it's all yours from here forward!

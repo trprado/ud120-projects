@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 print()
 print("checking for nltk")
 try:

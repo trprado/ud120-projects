@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import pickle
 import _pickle as cPickle
 import numpy

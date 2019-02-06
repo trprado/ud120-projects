@@ -62,3 +62,13 @@ print(f'Features: {features_train.shape[1]}')
 # Accuracy: 0.9772468714448237
 # Features: 3785
 #########################################################
+
+# Results Quizz 3 e 4
+#########################################################
+# no. of Chris training emails: 7936
+# no. of Sara training emails: 7884
+# tempo de treinamento: 7.803 s
+# tempo de predição: 0.004 s
+# Accuracy: 0.9664391353811149
+# Features: 379
+#########################################################

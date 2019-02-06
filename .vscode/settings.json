@@ -1,10 +1,12 @@
 {
     "editor.wordWrap": "wordWrapColumn",
-    "python.pythonPath": "/home/trprado/.local/share/virtualenvs/udacity-WaEjM5--/bin/python",
+    "python.pythonPath":
+        "/home/trprado/.local/share/virtualenvs/udacity-WaEjM5--/bin/python",
     "files.watcherExclude": {
         "**/.git/objects/**": true,
         "**/.git/subtree-cache/**": true,
+        "**/maildir/**": true
     },
     "python.linting.pylintEnabled": true,
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
 }

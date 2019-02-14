@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """
     A general tool for converting data from the
     dictionary format to an (n x k) python list that's

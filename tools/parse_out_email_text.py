@@ -1,3 +1,5 @@
+import re
+import string
 from nltk.stem.snowball import SnowballStemmer
 
 def parseOutText(f):
@@ -11,8 +13,7 @@ def parseOutText(f):
         f = open("email_file_name.txt", "r")
         text = parseOutText(f)
 
-        """
-
+    """
 
     f.seek(0)  ### go back to beginning of file (annoying)
     all_text = f.read()
@@ -22,17 +23,23 @@ def parseOutText(f):
     words = ""
     if len(content) > 1:
         ### remove punctuation
-        text_string = content[1].translate(bytes.maketrans("", ""), string.punctuation)
+        text_string = content[1].translate(str.maketrans('', '', string.punctuation))
+
+        # Unnecessary code
+        # text_string = re.sub(' +', ' ', text_string)
+        # text_string = re.sub('(\n\t)+', ' ', text_string)
+        # text_string = text_string.strip()
 
         ### project part 2: comment out the line below
-        words = text_string
+        # words = text_string
 
         ### split the text string into individual words, stem each word,
         ### and append the stemmed word to words (make sure there's a single
         ### space between each stemmed word)
+        stemmer = SnowballStemmer('english')
+        words = [stemmer.stem(word) for word in text_string.split()]
 
-
-    return words
+    return ' '.join(words)
 
 
 def main():

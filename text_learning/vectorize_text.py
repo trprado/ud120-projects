@@ -49,7 +49,7 @@ for name, from_person in [("sara", from_sara), ("chris", from_chris)]:
         words = parseOutText(email)
         ### use str.replace() to remove any instances of the words
         ### ["sara", "shackleton", "chris", "germani"]
-        names_drop = ["sara", "shackleton", "chris", "germani"]
+        names_drop = ['sara', 'shackleton', 'chris', 'germani', 'sshacklensf', 'cgermannsf']
         for name_drop in names_drop:
             words = words.replace(name_drop, '')
         ### append the text to word_data

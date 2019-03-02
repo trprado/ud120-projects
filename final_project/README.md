@@ -33,3 +33,11 @@ $ python poi_id.py
 ```
 
 > **Obs.:** Esse processo pode ser demorado.
+
+Para executar o `tester.py`
+
+```bash
+$ python tester.py
+```
+
+> **Obs.:** Esse processo pode ser demorado.

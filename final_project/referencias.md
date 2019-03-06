@@ -24,3 +24,4 @@
  - [Taward Data Science - Ways to Detect and Remove the Outliers](https://towardsdatascience.com/ways-to-detect-and-remove-the-outliers-404d16608dba)
  - [Taward Data Science - Working with Missing Data in Machine Learning](https://towardsdatascience.com/working-with-missing-data-in-machine-learning-9c0a430df4ce)
  - [Semantix - 10 Algoritmos de Machine Learning](https://www.semantix.com.br/blog/10-algoritmos-de-machine-learning)
+ - [Validação cruzada](https://pt.wikipedia.org/wiki/Valida%C3%A7%C3%A3o_cruzada)

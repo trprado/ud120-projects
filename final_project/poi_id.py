@@ -17,6 +17,47 @@ with open("final_project_dataset.pkl", "rb") as data_file:
 
 select_features_list = ['poi', 'salary', 'deferral_payments', 'total_payments', 'loan_advances', 'bonus', 'restricted_stock_deferred', 'deferred_income', 'total_stock_value', 'expenses', 'exercised_stock_options', 'other', 'long_term_incentive', 'restricted_stock', 'director_fees', 'to_messages', 'from_poi_to_this_person', 'from_messages', 'from_this_person_to_poi', 'shared_receipt_with_poi']
 
+
+# Imports para plotar as figuras
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df = pd.DataFrame().from_dict(dataset, orient='index')
+df.replace('NaN', np.nan, inplace=True)
+df.reset_index(drop=True, inplace=True)
+pois = df.poi.value_counts().copy()
+pois.index = np.array(['nPOI', 'POI'])
+print(f'Contagem de Pois:\n{pois}')
+print(f'Total: {df.shape[0]}')
+
+# Plot da contagem de valores nulos por feature.
+# null_perc = (df.isna().sum()/df.shape[0]*100)
+# fig, ax = plt.subplots(figsize=(18,10))
+# plt1 = sns.barplot(null_perc.index, null_perc.values, palette='Blues')
+# sns.despine(ax=ax, offset=2, trim=True)
+# ax.set_title('Porcentagem de valores nulos por feature')
+# ax.set_ylim(top=100)
+# ax.set_xlabel('Features')
+# ax.set_ylabel('Proporção (%)')
+# plt.xticks(rotation=45, ha='right')
+# plt.tight_layout()
+# fig.savefig('fig/null_counts.png')
+# plt.show()
+
+# Plota a contagem de POIs e não POIs
+# fig, ax = plt.subplots(figsize=(10,10))
+# plt1 = sns.countplot(x='poi', data=df)
+# sns.despine(ax=ax, offset=2, trim=True)
+# plt1.set_xticklabels(['não POI', 'POI'])
+# ax.set_title('Contagem de POIs e não POIs')
+# ax.set_xlabel('Pessoas de Interesse')
+# ax.set_ylabel('Contagem')
+# plt.tight_layout()
+# fig.savefig('fig/poi_count.png')
+# plt.show()
+
 selected_features = select_best_features(dataset, select_features_list, nan_perc=0.5)
 
 # Funcão para selecionar as melhores features do dataset.
@@ -47,7 +88,7 @@ data_dict.pop('LOCKHART EUGENE E', 0) # Pessoa com todos os valores nulos.
 data = featureFormat(data_dict, features_list, sort_keys=True)
 labels, features = targetFeatureSplit(data)
 
-from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import SelectKBest, f_classif
 
 features_new = SelectKBest(k='all')
 features_new.fit(features, labels)
@@ -59,15 +100,14 @@ print(f'Best scores: {features_new.scores_.round(4)}')
 print(f'P-values: {features_new.pvalues_.round(4)}')
 print('-'*80)
 
-
-### Task 3: Create new feature(s)
+## Task 3: Create new feature(s)
 # Features usadas para se criar as novas features
 # Salary se mostrou um dos melhores pontuadores e total_payment serve para para
 # visualizar ganhos gerais.
-select_to_new_features = ['salary', 'total_payments']
+# select_to_new_features = ['salary', 'total_payments']
 
 # Função gera novas features baseados em [x^2, x*y, y^2]
-data_dict, features_list = add_feature(data_dict, features_list, select_to_new_features)
+# data_dict, features_list = add_feature(data_dict, features_list, select_to_new_features)
 
 print('='*80)
 print(f'Final feature list: \n{features_list}')
@@ -107,7 +147,6 @@ labels, features = targetFeatureSplit(data)
 
 # Imports para fazer preprocessamento e decomposição além de criar o pipeline
 from sklearn.pipeline import Pipeline
-from sklearn.decomposition import PCA
 from sklearn.preprocessing import MinMaxScaler
 
 from sklearn.svm import SVC
@@ -170,28 +209,34 @@ parameters = [
 
 from sklearn.model_selection import StratifiedShuffleSplit, GridSearchCV
 
-# Valida e gera os scores para definir os melhores Classificadores, esta comentado pela demora ao executar todos os comparadores para algoritmos de árvore.
-for i in range(0, len(clfs)):
-    pipe = Pipeline([
-        ('preproc', MinMaxScaler()),
-        ('reduce', PCA()),
-        clfs[i]])
-    sss = StratifiedShuffleSplit(n_splits=10, test_size=0.2, random_state=42)
-    clf = GridSearchCV(pipe, param_grid=parameters[i], scoring='f1', cv=sss, refit=True)
-    clf.fit(features, labels)
-    print()
-    print('='*80)
-    print(clfs[i])
-    print('='*80)
-    index = clf.best_index_
-    print(f"Fit time mean: {clf.cv_results_['mean_fit_time'][index]:.4f}")
-    print(f"F1 score: {clf.best_score_:.4f}")
-    print(f'Best parameters: {clf.best_params_}')
-    print('-'*80)
+# Valida e gera os scores para definir os melhores Classificadores, esta
+#  comentado pela demora ao executar todos os comparadores para algoritmos
+# de árvore.
+# for i in range(0, len(clfs)):
+#     pipe = Pipeline([
+#         # ('kbest', SelectKBest(f_classif)),
+#         ('preproc', MinMaxScaler()),
+#         clfs[i]])
 
-    # Gera documentos html com os scores de cada algoritmo.
-    import pandas as pd
-    pd.DataFrame.from_dict(clf.cv_results_, orient='columns').loc[:, ['params', 'mean_fit_time', 'mean_test_score']].to_html('results/' + clfs[i][0] + 'results.html')
+#     params = parameters[i]
+#     # params.update({'kbest__k': np.arange(2, len(features_list), 2)})
+#     sss = StratifiedShuffleSplit(n_splits=10, random_state=42)
+#     clf = GridSearchCV(pipe, param_grid=params, scoring='f1', cv=sss, refit=True)
+#     clf.fit(features, labels)
+
+#     print()
+#     print('='*80)
+#     print(clfs[i])
+#     print('='*80)
+#     index = clf.best_index_
+#     print(f"Fit time mean: {clf.cv_results_['mean_fit_time'][index]:.4f}")
+#     print(f"F1 score: {clf.best_score_:.4f}")
+#     print(f'Best parameters: {clf.best_params_}')
+#     print('-'*80)
+
+#     # Gera documentos html com os scores de cada algoritmo.
+#     import pandas as pd
+#     pd.DataFrame.from_dict(clf.cv_results_, orient='columns').loc[:, ['params', 'mean_fit_time', 'mean_test_score']].to_html('results/' + clfs[i][0] + 'results.html')
 ################################################################################
 ################################################################################
 
@@ -257,7 +302,7 @@ import numpy as np
 # Transforma lista em array para acesso mais fácil ao retorno de split
 labels = np.array(labels)
 
-from sklearn.metrics import accuracy_score, precision_score, recall_score
+from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score
 
 minmaxs = MinMaxScaler()
 features = minmaxs.fit_transform(features, labels)
@@ -265,8 +310,9 @@ features = minmaxs.fit_transform(features, labels)
 # Melhores parâmetros encontrados para ter um balanço entre precision e recall:
 # clf = AdaBoostClassifier(learning_rate=0.6, n_estimators=67)
 
-sss = StratifiedShuffleSplit(n_splits=100, random_state=42)
+sss = StratifiedShuffleSplit(n_splits=10, random_state=42)
 
+import time
 # ==============================================================================
 # Teste para encontrar os melhores parâmetros para SVC, pode demorar
 # um pouco mais devido a quantidade de repetições e comparação entre
@@ -299,7 +345,7 @@ sss = StratifiedShuffleSplit(n_splits=100, random_state=42)
 # parâmetros.
 # ==============================================================================
 # parameters = {
-#     'max_depth': np.arange(start=1, stop=5, step=1),
+#     'max_depth': np.arange(start=1, stop=10, step=1),
 #     'min_samples_leaf': np.arange(start=2, stop=10, step=1),
 #     'min_samples_split': np.arange(start=2, stop=10, step=1)
 # }
@@ -311,8 +357,7 @@ sss = StratifiedShuffleSplit(n_splits=100, random_state=42)
 # print(f'Best precision: {gs_cv.best_score_}')
 # print(f'Best params: {gs_cv.best_params_}')
 # ==============================================================================
-# clf = RandomForestClassifier(max_depth=4, min_samples_leaf=2,
-# min_samples_split=8)
+# clf = RandomForestClassifier(max_depth=4, min_samples_leaf=2,min_samples_split=8)
 # ==============================================================================
 # Pontuação:
 # ==============================================================================
@@ -339,12 +384,12 @@ sss = StratifiedShuffleSplit(n_splits=100, random_state=42)
 # ==============================================================================
 # Melhores parâmetros encontrados para ter um balanço entre precision e recall com tuning manual:
 # ==============================================================================
-# clf = AdaBoostClassifier(learning_rate=0.6, n_estimators=67)
+clf = AdaBoostClassifier(learning_rate=0.6, n_estimators=67)
 # ==============================================================================
 # Melhores parâmetros encontrados com a utilização de GridSearchCV e
 # StratifiedShuffleSplit:
 # ==============================================================================
-clf = AdaBoostClassifier(learning_rate=0.9, n_estimators=88)
+# clf = AdaBoostClassifier(learning_rate=0.9, n_estimators=88)
 # Obs.: É importante notar que o tunning manual resultou em uma melhor pontuação no teste final, enquanto que o automático teve melhores resultados locais mas a custo de um grande tempo computacional.
 # ==============================================================================
 # Pontuação:
@@ -354,12 +399,14 @@ clf = AdaBoostClassifier(learning_rate=0.9, n_estimators=88)
 # Recall score: 0.3350
 # ------------------------------------------------------------------------------
 
+
 # ==============================================================================
 # Pega a média da Acuracia, Precisão e Validação para verificar se esta com
 # uma boa precissão
 # ==============================================================================
-import time
+
 time_list = []
+f1_list = []
 accuracy_list = []
 precision_list = []
 recall_list = []
@@ -375,6 +422,7 @@ for train_index, test_index in sss.split(features, labels):
 
     pred = clf.predict(feature_test)
 
+    f1_list.append(f1_score(labels_test, pred))
     accuracy_list.append(accuracy_score(labels_test, pred))
     precision_list.append(precision_score(labels_test, pred))
     recall_list.append(recall_score(labels_test, pred))
@@ -385,6 +433,7 @@ print(str(clf))
 print('='*80)
 print('Scores and excution time means:')
 print(f'Time mean: {np.array(time_list).mean():.4f}s')
+print(f'F1 score: {np.array(f1_list).mean():.4f}')
 print(f'Accuracy score: {np.array(accuracy_list).mean():.4f}')
 print(f'Precision score: {np.array(precision_list).mean():.4f}')
 print(f'Recall score: {np.array(recall_list).mean():.4f}')

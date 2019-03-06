@@ -40,7 +40,7 @@ def select_best_features(dataset:Dict[str, Dict[str, float]], feature_list:List[
     :rtype: Dict[str,float]
     """
 
-    features = pd.DataFrame.from_dict(dataset, orient='index', dtype=None, columns=None)
+    features = pd.DataFrame.from_dict(dataset, orient='index')
 
     # Seleciona o label como lista
     labels = features.loc[:, feature_list[label_pos]].tolist()
@@ -68,9 +68,9 @@ def select_best_features(dataset:Dict[str, Dict[str, float]], feature_list:List[
     if plt_matrix:
         # Plot a scatter matrix of all features
         print(features.info())
-        sns.pairplot(features)
+        ax = sns.pairplot(features)
         plt.tight_layout()
-        fig.savefig('fig/best_features.png')
+        ax.savefig('fig/best_features.png')
         plt.show()
     print()
 
@@ -110,7 +110,7 @@ def remove_outliers(dataset:Dict[str, Dict[str, float]], feature_list:List[str],
     :rtype: Dict[str, Dict[str, float]]
     """
 
-    features = pd.DataFrame().from_dict(dataset, orient='index', dtype=None, columns=None)
+    features = pd.DataFrame().from_dict(dataset, orient='index')
 
     for col in features.columns:
         if col not in feature_list:

@@ -1,12 +1,33 @@
+---
+title:  'Enron Submission Report'
+author:
+- Thiago Roberto do Prado <trprado@outlook.com>
+...
+
 # Enron Submission Report
 
 ## 1.
-O objetivo é identificar pessoas de interesse (**POIs**), discriminando quais são **POIs** e quais não são **POIs**. Ao se aplicar métodos de *Machine Learning* é possível, ao analisar os dados, modelar (treinamento) e validar (validação) o modelo formulado para predizer se futuras observações podem ser atribuídas ou não a categoria de POIs. Por exemplo, a variável X é uma variável de importância visto que **POIs** possuem maior valores monetários do que pessoas não **POIs**, assim, uma futura observação que também possui esse valor monetário em destaque tem maior chance de ser um candidato a ser um **POI**.
+O objetivo é identificar de 145 observações "*data points*" analisadas, pessoas de interesse (**POIs**), discriminando quais são **POIs** (18) e quais não são **POIs** (127), a contagem pode ser vista no gráfico abaixo. Ao se aplicar métodos de *Machine Learning* é possível, ao analisar os dados, modelar (treinamento) e validar (validação) o modelo formulado para predizer se futuras observações podem ser atribuídas ou não a categoria de POIs. Por exemplo, a variável X é uma variável de importância visto que **POIs** possuem maior valores monetários do que as pessoas não **POIs**, assim, uma futura observação que também possui esse valor monetário em destaque tem maior chance de ser um candidato a ser um **POI**.
 
-Foram observados outliers nos dados *TOTAL*, com valores que na realidade são as somas de todos os demais valores do dataset; *THE TRAVEL AGENCY IN THE PARK*, uma agência de viagens que não tem relação direta com a *Enron*; *LOCKHART EUGENE E* uma pessoa onde todos os valores são nulos, e eles foram tratados com a remoção dos seus dados do *dataset*. Valores que o *IQR* score considerava como *outliers* não foram removidos, pois se tratavam de **POIs** com grande valor em seus atributos, outros são investidores que não chegam a ter alguma relação com **POIs** mas devido a não ter uma relação direta com a *Enron* seus dados como (salário, *emails* para **POIs**, etc) tinham valores nulos e foram tratados como zero.
+![Contagem de POIs e não POIs](fig/poi_count.png)
+
+Foram observados outliers nos dados *TOTAL*, com valores que na realidade são as somas de todos os demais valores do dataset; *THE TRAVEL AGENCY IN THE PARK*, uma agência de viagens que não tem relação direta com a *Enron*; *LOCKHART EUGENE E* uma pessoa onde todos os valores são nulos, e eles foram tratados com a remoção dos seus dados do *dataset*. Valores que o *IQR* score considerava como *outliers* não foram removidos, pois se tratavam de **POIs** com grande valor em seus atributos, outros são investidores que não chegam a ter alguma relação com **POIs** mas devido a não ter uma relação direta com a *Enron* seus dados como (salário, *emails* para **POIs**, etc) tinham valores nulos e foram tratados como zero. As três *features* que possuiam as maiores porcentagens de valores nulos são: `loan_advances` com quase 100% das suas observações como nulas, `restricted_stock_deferred` e `director_fees` ambas com mais de 80% de observações nulas, como pode ser observado no gráfico a seguir, é apresentada porcentagem de valores nulos em cada coluna que representa as *features*.
+
+![Porcentagem de valores nulos em cada *feature*](fig/null_counts.png)
 
 ## 2.
-As variáveis explicativas (*features*) utilizadas foram: `salary`, `total_payments`, `bonus`, `total_stock_value`, `expenses`, `from_poi_to_this_person`, `exercised_stock_options`, `other`, `shared_receipt_with_poi`, `restricted_stock`, `salary^2`, `salary total_payments`, `total_payments^2` as quais foram identificadas utilizando o algoritmo *SelectKBest* devido sua forma de pegar pontuações por `f1_score` e retornar também o `p-value`, assim fica possível definir estatisticamente a importância de cada *feature*, removendo as *features* que apresentaram a contagem de valores nulos maior que 50% do seu tamanho total e selecionando aquelas com p-valor menor ou igual ao nível de significância de 5% (*alpha*). Para tal, foi criada uma função com o intuito de facilitar o uso do *SelectKBest*, com o objetivo de determinar a porcentagem de valores nulos aceitos e o nível de significância (*alpha*).
+As variáveis explicativas (*features*) utilizadas foram: `salary`, `total_payments`, `bonus`, `total_stock_value`, `expenses`, `from_poi_to_this_person`, `exercised_stock_options`, `other`, `shared_receipt_with_poi`, `restricted_stock` as quais foram identificadas utilizando o algoritmo *SelectKBest* devido sua forma de pegar pontuações por `f1_score` e retornar também o `p-value`, assim fica possível definir estatisticamente a importância de cada *feature*, removendo as *features* que apresentaram a contagem de valores nulos maior que 50% do seu tamanho total e selecionando aquelas com p-valor menor ou igual ao nível de significância de 5% (*alpha*). Para tal, foi criada uma função com o intuito de facilitar o uso do *SelectKBest*, com o objetivo de determinar a porcentagem de valores nulos aceitos e o nível de significância (*alpha*). Além disso, nas *features* selecionadas foram feitos testes para definir quais corresponderiam a melhores pontuações, para isso foram feitos testes a partir de duas variáveis até o total de *features* selecionadas, a pontuação segue na tabela abaixo. Porém, mesmo que alguns K tenham mostrado melhores valores em F1 isso se deve a quantidade de limitada de repetições que ocorreram, essas repetições tiveram de ser limitadas para o equipamento suportar a execução em um tempo limite. O *SelectKBest* foi escolhido por permitir que a partir de um dado K fossem selecionadas as *K-features* com melhor correlação entre si.
+
+
+| Modelo | k=2 | k=4 | k=6 | k=8 | k=10 |
+|---|---|---|---|---|---|
+| SVC | 0.4333 | 0.4333 | 0.4333 | 0.4333 | 0.4133 |
+| GNC | 0.3400 | 0.3438 | 0.3633 | 0.3133 | 0.1952 |
+| DTC | 0.4833 | 0.5367 | 0.3467 | 0.4352 | 0.3852 |
+| KNC | 0.5333 | 0.5167 | 0.3867 | 0.2200 | 0.1667 |
+| RFC | 0.4667 | 0.5667 | 0.4167 | 0.4333 | 0.4067 |
+| ADA | 0.5000 | 0.4333 | 0.4333 | 0.4333 | 0.4167 |
+
 
 ### Pontuação das *features* antes da seleção
 ```
@@ -24,7 +45,12 @@ Feature List:
 ================================================================================
 ```
 
-Novas *features* foram criadas utilizando do algoritmo *PolynomialFeatures*, com ele foi passado duas *features* existentes, e ele gerou quatro novas *features* sendo elas `1`, `x^2`, `x*y` e `y^2`, a *feature* `'1'` foi removida por não gerar um `f1_score` ou `p-value`. Também foi realizado o escalonamento dos valores com *MinMaxScale*, esse escalonamento foi necessário para que alguns algoritmos de *Machine Learning* trabalhassem corretamente com as *features*.
+Novas *features* foram criadas utilizando do algoritmo *PolynomialFeatures*, com ele foi passado duas *features* existentes, e ele gerou quatro novas *features* sendo elas `1`, `x^2`, `x*y` e `y^2`, a *feature* `'1'` foi removida por não gerar um `f1_score` ou `p-value`, as demais não foram utilizados por não gerar diferenças significativas como segue na tabela abaixo. Também foi realizado o escalonamento dos valores com *MinMaxScale*, esse escalonamento foi necessário para que alguns algoritmos de *Machine Learning* trabalhassem corretamente com as *features*.
+
+| Modelo | F1 | Precision | Recall |
+|---|---|---|---|
+| Ada S/ Novas Features | 0.3538 | 0.4020 | 0.3160 |
+| Ada C/ Novas Features | 0.3483 | 0.3927 | 0.3130 |
 
 ### Pontuação das *features* depois da seleção com novas *features* adicionadas
 ```
@@ -36,15 +62,15 @@ P-values: [0.     0.0036 0.     0.     0.0148 0.0235 0.     0.0426 0.0039 0.0029
 --------------------------------------------------------------------------------
 ================================================================================
 Final feature list:
-['poi', 'salary', 'total_payments', 'bonus', 'total_stock_value', 'expenses', 'from_poi_to_this_person', 'exercised_stock_options', 'other', 'shared_receipt_with_poi', 'restricted_stock', 'salary^2', 'salary total_payments', 'total_payments^2']
-Count features: 14
+['poi', 'salary', 'total_payments', 'bonus', 'total_stock_value', 'expenses', 'from_poi_to_this_person', 'exercised_stock_options', 'other', 'shared_receipt_with_poi', 'restricted_stock']
+Count features: 11
 ================================================================================
 ```
 
 ## 3.
 Os algoritmos para a modelagem usados foram: *SVC*, *GaussianNB*, *DecisionTreeClassifier*, *KNeighborsClassifier*, *RandomForestClassifier*, *AdaBoostClassifier*, pois são algoritmos de classificação mais adequados para analisar a variável resposta `poi`. O tempo médio de execução e o `f1_score` foram utilizados para selecionar o melhor algoritmo utilizando validação cruzada, garantindo assim um melhor desempenho. De todos os algoritmos testados apenas três foram selecionados: *SVC*, *RandomForestClassifier* e *AdaBoostClassifier* pois resultaram nas melhores pontuação em `f1` por um baixo tempo de processamento.
 
-O *SVC* foi o melhor em pontuação e tempo, porém ao fazer testes com a *precision* e *recall* ele não obteve um desempenho desejável observado na *precision* e na *recall*. O mesmo ocorreu com *RandomForestClassifier*. Optou-se em utilizar o *AdaBoostClassifier* que obteve os melhores resultados nas pontuações da acurácia, *precision* e 8. Também foram feitas novas validações cruzadas nesses algoritmos, utilizando um maior número de parâmetros, o que aumentou o tempo computacional para validar, também foi utilizado as opções de usar mais núcleos de processamento, mas devido a grande quantidade de zeros presentes nos dados apareciam muitos avisos em tela atrapalhando a visualização dos resultados.
+O *SVC* foi o melhor em pontuação e tempo, porém ao fazer testes com a *precision* e *recall* ele não obteve um desempenho desejável observado na *precision* e na *recall*. O mesmo ocorreu com *RandomForestClassifier*. Optou-se em utilizar o *AdaBoostClassifier* que obteve os melhores resultados nas pontuações da acurácia, *precision* e *recall*. Também foram feitas novas validações cruzadas nesses algoritmos, utilizando um maior número de parâmetros, o que aumentou o tempo computacional para validar, utilizou-se também as opções de usar mais núcleos de processamento, mas devido a grande quantidade de zeros presentes nos dados apareciam muitos avisos em tela atrapalhando a visualização dos resultados.
 
 ### Resultados da seleção do melhor classificador.
 ```
@@ -98,14 +124,14 @@ Best parameters: {'ada__learning_rate': 0.5, 'ada__n_estimators': 10}
 ```
 
 ## 4.
-Usar o *tuning* no algoritmo escolhido possibilitou obter melhor ajuste nas pontuações da acurácia, *precision* e *recall*, consequentemente adquiriu-se resultados mais promissores. Caso não seja realizado um *tuning*, o algoritmo pode não trazer os melhores resultados, incluindo gerar maiores números de erros do tipo 1 e 2. O *tuning* utilizado no algoritmo escolhido (*AdataBoostClassfier*) foi feito utilizando *StratifiedShuffleSplit* e *GridSearchCV*, aumentando também o número de possibilidades de parâmetros e repetições para garantir um melhor resultado. Uma consequência indesejável desse processo foi que o aumento no tempo de processamento (em horas) até selecionar um grupo de parâmetros que melhor equilibre as pontuações.
+Usar o *tuning* no algoritmo escolhido possibilitou obter melhor ajuste nas pontuações da acurácia, *precision* e *recall*, consequentemente adquiriu-se resultados mais promissores. Caso não seja realizado um *tuning*, o algoritmo pode não trazer os melhores resultados, incluindo gerar maiores números de erros do tipo 1 e 2. O *tuning* utilizado no algoritmo escolhido (*AdataBoostClassfier*) foi feito utilizando *StratifiedShuffleSplit* e *GridSearchCV*, aumentando também o número de possibilidades de parâmetros e repetições para garantir um melhor resultado. Uma consequência indesejável desse processo foi que o aumento no tempo de processamento (em horas) até selecionar um grupo de parâmetros que melhor equilibre as pontuações. Em caso de um algoritmo que não possui a necessidade de ajustar seus parâmetros, o *tuning* deveria ser feito nas *features*, selecionando e testando entre aquelas que melhor trazem resultados ao algoritmo. Assim, mesmo sem uma mudança de parâmetros poderíamos chegar a uma conclusão melhor ao usar *features* diferentes.
 
-Em caso de um algoritmo que não possui a necessidade de ajustar seus parâmetros, o *tuning* deveria ser feito nas *features*, selecionando e testando entre aquelas que melhor trazem resultados ao algoritmo. Assim, mesmo sem uma mudança de parâmetros poderíamos chegar a uma conclusão melhor ao usar *features* diferentes.
+Os parâmetros do *StratifiedShuffleSplit* utilizados foram: `n_splists=100` que diz quantos testes cada modelo deve ser realizado; `random_state=42` para gerar uma semente, assim garantindo que vai gerar os mesmos resultados a cada execução do algoritmo; e `test_size` que foi mantido por padrão, assim o *dataset* foi dividido em partes iguais. Já o *GridSearchCV* foram usados os parâmetros: `estimator` que recebeu um *Pipeline* com os algoritmos que deveria executar em ordem; `param_grid` com listas de parâmetros que devem ser utilizados para o afinamento na validação cruzada; `scoring` com o tipo de algoritmo para avaliar a predição; `cv` que recebe a estratégia de validação cruzada, no caso *StratifiedShuffleSplit*. Já o Algoritmo usado como final *AdaBoostClassifier* foram usados os parâmetros: `learning_rate=0.6` que diz o quanto cada classificado vai contribuir; `n_estimators=67` que define o número máximo de estimadores em cada *boost*. Cada um desses parâmetros do *AdaBoostClassifier* foram executados com variações de 1 no caso de `n_estimators` e 0.1 no caso de `learning_rate`.
 
 ## 5.
 A validação serve para avaliar o quanto o modelo prediz bem a sua variável resposta predita a qual sera correlacionada com a variável resposta verdadeira que foi ocultada no processo de validação. Em resposta obtêm-se a acurácia entre esses valores, quanto maior for a acurácia melhor sera avaliado o modelo. O problema clássico da validação é garantir a representatividade dos dados, tanto na validação quanto no treinamento, isso é, caso exista algum padrão nos dados, a divisão entre treinamento e teste pode render uma baixa acurácia pois por exemplo os dados de uma certa pessoa podem estar no início e de outra no final. Ao tornar os dados de validação aleatórios, garante essa representatividade, assim não usando dados que podem estar seguindo um padrão.
 
-Para validar minha análise utilizei StratifiedShuffleSplit, assim valores seriam pegos de forma aleatória dentro do conjunto de dados, garantindo uma maior acurácia entre o grupo de treinamento e o teste realizado.
+Para validar minha análise utilizei *StratifiedShuffleSplit*, assim valores seriam pegos de forma aleatória dentro do conjunto de dados e também possibilitando uma validação cruzada entre vários métodos diferentes passados pelo *Pipeline*. De acordo com a **Wikipedia** e a documentação do algoritmo: "A validação cruzada é uma técnica para avaliar a capacidade de generalização de um modelo, a partir de um conjunto de dados", garantindo uma maior acurácia entre o grupo de treinamento e o teste realizado.
 
 ## 6.
 As métricas *precision* é a capacidade de não classificar um rótulo como positivo em uma amostra que é negativa, a pontuação ser dada por $tp/(tp+fp)$, onde $tp$ é a contagem de verdadeiros positivos e $fp$ a contagem de falsos positivos. Já *recall* é uma pontuação que mostra a capacidade do classificador de encontrar todas as amostras positivas, ele é dado pela fórmula $tp/(tp+fn)$ onde $tp$ é a contagem de verdadeiros positivos e $fn$ a contagem de falsos negativos. Quanto maiores forem os valores de de *recall* e *precision* melhor o modelo é avaliado, porém esses valores estão sujeitos a qualidade dos dados, ou seja, um valor "baixo" de *recall* e *precision* não quer dizer necessariamente que o modelo não prediz bem os dados de teste. Por isso, esses valores com a acurácia devem ser avaliados conjuntamente para avaliar o modelo como um todo.
